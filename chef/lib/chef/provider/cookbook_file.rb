@@ -40,7 +40,12 @@ class Chef
              Chef::Log.debug("staging #{file_cache_location} to #{staging_file.path}")
              staging_file.close
              stage_file_to_tmpdir(staging_file.path)
-             FileUtils.mv(staging_file.path, @new_resource.path)
+             if RUBY_PLATFORM =~ /mswin|mingw32|windows/
+               FileUtils.cp(staging_file.path, @new_resource.path)
+               FileUtils.rm(staging_file.path)
+             else
+               FileUtils.mv(staging_file.path, @new_resource.path)
+             end
            end
            @new_resource.updated_by_last_action(true)
          else
